@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="ja">
+	<head>
+		<meta charset="UTF-8">
+		<link rel="manifest" href="./manifest.webmanifest">
+		<script src="./openlayers_v7_2_2_ol.js"></script>
+		<link rel="stylesheet" href="./openlayers_v7_2_2_ol.css" type="text/css">
+		<link rel="stylesheet" href="./chiriin_chizu072.css" type="text/css">
+		<script src="./chiriin_chizu072.js"></script>
+		<title>地理院地図Plus</title>
+		<script>
+/******
+if('serviceWorker' in navigator)
+{
+	navigator.serviceWorker.register('/chiriin_chizu_service_worker070.js').then(function()
+	{
+		console.log(new Date() + ":Service Worker is registered!!");
+	});
+}
+******/
+function onChangeMode()
+{
+	let mode = document.MenuForm.Mode.value;
+	let typ = document.MenuForm.Type.value;
+	let pt = document.MenuForm.Point.value;
+	let line = document.MenuForm.Line.value;
+	let io = document.MenuForm.InOut.value;
+	let oth = document.MenuForm.Other.value;
+	console.log(`onChangeMode Mode:${mode}, Type:${typ}, Point:${pt}, Line:${line}, IO:${io}, oth:${oth}`);
+
+	let flag = ('0' == mode) ? 'block' : 'none';
+	document.querySelectorAll('.forView').forEach(item => item.style.display = flag);
+	flag = (('1' == mode) || ('2' == mode)) ? 'block' : 'none';
+	document.querySelectorAll('.forAdd, .forEdit').forEach(item => item.style.display = flag);
+
+	flag = ('1' == typ) ? 'block' : 'none';
+	document.querySelectorAll('.ofPoint').forEach(item => item.style.display = flag);
+	flag = ('2' == typ) ? 'block' : 'none';
+	document.querySelectorAll('.ofLine').forEach(item => item.style.display = flag);
+}
+		</script>
+		<svg version="1.1" xmlns="http://www.w3.org/2000/svg"
+		 xmlns:xlink="http://www.w3.org/1999/xlink"
+		 style="display:none">
+			<defs>
+				<g viewBox="0 0 6 8" id="icon_open" style="stroke:gray; fill:none">
+					<path d="M 0 3 l 3 -2 l 3 2"/>
+					<path d="M 0 5 l 3 -2 l 3 2"/>
+					<path d="M 0 7 l 3 -2 l 3 2"/>
+				</g>
+				<g viewBox="0 0 6 8" id="icon_close" style="stroke:#f77; fill:none">
+					<path d="M 0 1 l 3 2 l 3 -2"/>
+					<path d="M 0 3 l 3 2 l 3 -2"/>
+					<path d="M 0 5 l 3 2 l 3 -2"/>
+				</g>
+			</defs>
+		</svg>
+	</head>
+	<body>
+		<div id="TopOverlay">
+			Zoom: <span id="zoomLevel"></span>&nbsp;
+			<select id="positionSelect" size="3" onClick="show_hide('#positionSelect', true)">
+				<option value="0" selected>XX.XXXXXX N, YYY.YYYYY E</option>
+				<option value="1">XX&deg;YY&prime;ZZ.ZZ&Prime;N,XXX&deg;YY&prime;ZZ.Z&Prime;E</option>
+				<option value="2">北緯XX度YY分ZZ.ZZ秒,東経XXX度YY分ZZ.Z秒</option>
+			</select>
+			<span id="positionLabel" onClick="show_hide('#positionSelect')"></span>
+		</div>
+		<div id="map" class="map"></div>
+		<div id="BottomOverlay">
+			<svg viewBox="0 0 6 8"
+			 onClick="show_hide2('#MenuGrid', this, '#icon_close', '#icon_open')">
+				<use href="#icon_open"/></svg>
+			<form action="#" name="MenuForm" style="display:inline-block" onChange="onChangeMode()">
+				<div id="MenuGrid">
+					<img src="./qrcode.png" width="20px" height="20px" style="position:absolute; top:4px; left:0px"/>
+					<div>
+						<span>操作</span><br>
+						<label><input type="radio" name="Mode" value="0" selected>設定</label><br>
+						<label><input type="radio" name="Mode" value="1">追加</label><br>
+						<label><input type="radio" name="Mode" value="2">編集</label>
+					</div>
+					<div class="forAdd forEdit">
+						<span>種別</span><br>
+						<label><input type="radio" name="Type" value="1" selected>地点</label><br>
+						<label><input type="radio" name="Type" value="2">線引き</label>
+					</div>
+					<div class="forAdd forEdit">
+						<br>
+						<select class="ofPoint" id="MenuPoint" name="Point">
+							<option value="暫定">とりあえず</option>
+							<option value="駐車">駐車</option>
+							<option value="立間">タツマ</option>
+							<option value="旗">旗</option>
+							<option value="囲穴">囲いの穴</option>
+							<option value="送電塔">送電線鉄塔</option>
+							<option value="鹿跡">鹿跡</option>
+							<option value="猪跡">猪跡</option>
+							<option value="獣跡">獣跡</option>
+							<option value="檻罠">檻ワナ</option>
+							<option value="括罠">くくりワナ</option>
+							<option value="鹿獲">鹿捕獲地点</option>
+							<option value="猪獲">猪捕獲地点</option>
+							<option value="出発点">出発点</option>
+							<option value="経由地">経由地</option>
+							<option value="目的地">目的地</option>
+						</select><br>
+						<select class="ofLine" id="MenuLine" name="Line">
+							<option value="暫定">暫定</option>
+							<option value="足跡">足跡</option>
+							<option value="岨道">岨道・険路</option>
+							<option value="廃道">廃道</option>
+							<option value="私道">私道</option>
+							<option value="遊歩道">遊歩道</option>
+							<option value="鉄柵">鉄柵</option>
+							<option value="防獣網">防獣網</option>
+							<option value="送電線">送電線</option>
+							<option value="水路">水路</option>
+							<option value="鉄管道">鉄管道</option>
+							<option value="囲み線">囲み線</option>
+							<option value="禁猟区">禁猟区</option>
+							<option value="銃禁区">銃禁区</option>
+							<option value="要配慮">要配慮</option>
+							<option value="要注意">要注意</option>
+						</select>
+						<label class="ofLine">内外の区別:<input type="checkbox" id="MenuInOut" name="InOut"></label>
+					</div>
+					<div class="forView">
+						<br><br>
+						<select id="MenuOther" name="Other">
+							<option value="" selected>閲覧</option>
+							<!-- Points -->
+							<!-- Lines -->
+							<option value="Trace">足跡記録</option>
+							<option value="RegGPS">現在地登録</option>
+							<option value="TakePhoto">現在地写真</option>
+							<option value="Edit">編集</option>
+
+							<option value="Pos">場所追加</option>
+							<option value="Flag">旗追加</option>
+							<option value="Tower">鉄塔追加</option>
+							<option value="Gate">門追加</option>
+							<option value="EditTrace">足跡編集</option>
+							<option value="EditFree">手書き編集</option>
+							<option value="Photo">写真撮影</option>
+
+							<option value="Fence1">柵1追加</option>
+							<option value="Fence2">柵2追加</option>
+							<option value="HiLine">高圧線描画</option>
+						</select><br>
+						<button onClick="navigator.serviceWorker.getRegistration().then(registration => {registration.unregister();})">SW更新</button>
+					</div>
+				</div>
+			</form>
+		</div>
+	</body>
+</html>

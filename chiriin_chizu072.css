@@ -1,0 +1,61 @@
+div#map
+{
+	height: 97vh;
+	width: 97vw;
+	margin: auto;
+}
+div#TopOverlay
+{
+	position: fixed;
+	top: 0;
+	left: 45px;
+	background: #fffc;
+	width: auto;
+	padding: 4px;
+	z-index: 1;
+}
+div#BottomOverlay
+{
+	position: fixed;
+	bottom: 0;
+	background: white;
+	width: auto;
+	padding: 4px 4px 4px 0;
+	z-index: 1;
+}
+div#BottomOverlay > svg
+{
+	vertical-align: bottom;
+	display: inline-block;
+	width: 20px;
+	height: 20px;
+}
+div#BottomOverlay #MenuGrid
+{
+	display: none;
+}
+
+span#positionLabel
+{
+	background: white;
+	border: 1px solid gray;
+	border-radius: 2px;
+	padding: 0 4px;
+}
+select#positionSelect
+{
+	display: none;
+	position: absolute;
+	z-index: 1;
+}
+#BottomOverlay #Menu div
+{
+	vertical-align: top;
+	line-height: 120%;
+}
+#BottomOverlay #Menu div *
+{
+	margin: 0;
+	padding: 0;
+}
+#BottomOverlay #Menu div { display: inline-block; }
